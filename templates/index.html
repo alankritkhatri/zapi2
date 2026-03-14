@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zapi - Salesforce Explorer</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      :root {
+        --font-primary:
+          "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        --bg-color: #ffffff;
+        --text-color: #000000;
+        --border-color: #e0e0e0;
+        --button-bg: #000000;
+        --button-text: #ffffff;
+        --hover-bg: #333333;
+      }
+
+      body {
+        background-color: var(--bg-color);
+        font-family: var(--font-primary);
+        color: var(--text-color);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        margin-bottom: 1rem;
+      }
+
+      .container {
+        max-width: 900px;
+        margin-top: 60px;
+      }
+
+      /* Notion-like minimal cards */
+      .card {
+        border: 1px solid var(--border-color);
+        border-radius: 4px; /* Slight roundness */
+        box-shadow: none;
+        background: #fff;
+        margin-bottom: 20px;
+      }
+
+      .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+
+      /* Inputs */
+      .form-control {
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 10px 12px;
+        font-size: 0.95rem;
+        box-shadow: none;
+      }
+
+      .form-control:focus {
+        border-color: #000;
+        box-shadow: 0 0 0 1px #000;
+      }
+
+      .form-label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #666;
+        margin-bottom: 6px;
+      }
+
+      /* Buttons */
+      .btn-primary,
+      .btn-success {
+        background-color: var(--button-bg);
+        border: 1px solid var(--button-bg);
+        color: var(--button-text);
+        border-radius: 4px; /* Consistent radius */
+        font-weight: 500;
+        font-size: 0.95rem;
+        padding: 10px 16px;
+        transition: all 0.2s ease;
+      }
+
+      .btn-primary:hover,
+      .btn-success:hover {
+        background-color: var(--hover-bg);
+        border-color: var(--hover-bg);
+        color: #fff;
+      }
+
+      .btn-check:checked + .btn,
+      .btn.active,
+      .btn.show,
+      .btn:first-child:active,
+      :not(.btn-check) + .btn:active {
+        background-color: var(--hover-bg);
+        border-color: var(--hover-bg);
+        color: #fff;
+      }
+
+      /* Zapi Branding Header */
+      .brand-header {
+        margin-bottom: 40px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .brand-logo {
+        width: 32px;
+        height: 32px;
+        background: #000;
+        border-radius: 4px;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+      }
+
+      .brand-text {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+      }
+
+      /* Code block mimic */
+      code {
+        font-family:
+          "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
+          monospace;
+        font-size: 0.85em;
+        background-color: #f7f7f5; /* Notion grey background */
+        color: #eb5757; /* Notion red for code */
+        padding: 4px 6px;
+        border-radius: 3px;
+      }
+
+      pre code {
+        display: block;
+        padding: 1rem;
+        color: #37352f;
+        background-color: #f7f7f5;
+        overflow-x: auto;
+      }
+
+      .table-responsive {
+        border-radius: 4px;
+        border: 1px solid var(--border-color);
+      }
+
+      .table {
+        margin-bottom: 0;
+      }
+
+      .table th {
+        font-weight: 600;
+        font-size: 0.85rem;
+        background-color: #fbfbfa;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .table td {
+        font-size: 0.9rem;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .alert {
+        border: 1px solid var(--border-color);
+        background-color: #fff;
+        color: #000;
+        border-left: 3px solid #000;
+        border-radius: 4px;
+      }
+
+      .alert-danger {
+        border-left-color: #e03e3e;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="brand-header justify-content-center">
+        <div class="brand-logo">Z</div>
+        <h2 class="brand-text">Zapi</h2>
+      </div>
+
+      {% if not connected %}
+      <div class="row justify-content-center">
+        <div class="col-md-7">
+          <div class="card p-5">
+            <h5 class="card-title">Connect to Environment</h5>
+            <form action="/connect" method="post">
+              <div class="mb-4">
+                <label class="form-label">Username</label>
+                <input
+                  type="text"
+                  name="username"
+                  class="form-control"
+                  required
+                  placeholder="user@org.com"
+                />
+              </div>
+              <div class="row mb-4">
+                <div class="col-md-6">
+                  <label class="form-label">Password</label>
+                  <input
+                    type="password"
+                    name="password"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Security Token</label>
+                  <input
+                    type="password"
+                    name="token"
+                    class="form-control"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label">OpenAI API Key</label>
+                <input
+                  type="password"
+                  name="openai_key"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary w-100">
+                Start Session
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% else %}
+
+      <div class="row">
+        <!-- Query Section -->
+        <div class="col-md-12 mb-4">
+          <div class="card p-4">
+            <h5 class="card-title">Ask Zapi</h5>
+            <form action="/query" method="post" class="d-flex gap-2">
+              <input
+                type="text"
+                name="nl_query"
+                class="form-control"
+                placeholder="Ask: 'Show leads' or 'Create Account Acme'..."
+                required
+                style="height: 48px"
+              />
+              <button
+                type="submit"
+                class="btn btn-primary"
+                style="height: 48px; padding-left: 24px; padding-right: 24px"
+              >
+                Run
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {% if soql %}
+        <!-- Results Section -->
+        <div class="col-12 mb-4">
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <div class="card p-4 h-100">
+                <h6 class="card-title">Generated Query</h6>
+                <pre class="mb-0"><code>{{ soql }}</code></pre>
+              </div>
+            </div>
+
+            <!-- Visualization Section -->
+            <div class="col-md-6 mb-4">
+              <div class="card p-4 h-100">
+                <h6 class="card-title">Visualization: {{ chart_title }}</h6>
+                <canvas id="myChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="card p-4">
+            <h6 class="card-title">Data Result</h6>
+            <div class="table-responsive">{{ table | safe }}</div>
+          </div>
+        </div>
+
+        {% endif %}
+      </div>
+      {% endif %} {% if error %}
+      <div class="alert alert-danger mt-3">
+        <strong>Error:</strong> {{ error }}
+      </div>
+      {% endif %} {% if message %}
+      <div class="alert mt-3">{{ message }}</div>
+      {% endif %}
+    </div>
+
+    <script>
+      {% if chart_labels %}
+      const ctx = document.getElementById('myChart');
+      new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: {{ chart_labels | safe }},
+              datasets: [{
+                  label: 'Value',
+                  data: {{ chart_data | safe }},
+                  backgroundColor: '#000000',
+                  hoverBackgroundColor: '#333333',
+                  borderRadius: 2,
+                  barPercentage: 0.6
+              }]
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                  legend: {
+                      display: false
+                  },
+                  tooltip: {
+                      backgroundColor: '#000',
+                      titleFont: { family: 'Inter' },
+                      bodyFont: { family: 'Inter' },
+                      padding: 10,
+                      cornerRadius: 4,
+                  }
+              },
+              scales: {
+                  x: {
+                      grid: { display: false },
+                      ticks: { font: { family: 'Inter' } }
+                  },
+                  y: {
+                      beginAtZero: true,
+                      grid: { color: '#f0f0f0' },
+                      ticks: { font: { family: 'Inter' } }
+                  }
+              }
+          }
+      });
+      {% endif %}
+    </script>
+  </body>
+</html>

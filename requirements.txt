@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+simple-salesforce
+pandas
+python-dotenv
+openai
+jinja2
+python-multipart
