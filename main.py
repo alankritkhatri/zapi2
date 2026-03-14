@@ -40,6 +40,8 @@ IMPORTANT: 'soql' MUST start with 'SELECT'. NEVER perform DELETE, INSERT, or UPD
 ]}
 
 KEY RULES:
+- Custom Salesforce objects MUST have '__c' suffix (e.g. MyObject__c). Standard objects do NOT (Account, Contact, Opportunity, Lead, Case, etc.)
+- NEVER invent non-existent objects like 'DataQualityIssues'. For data quality analysis, query standard objects: missing fields on Account/Contact, stale Opportunities, etc.
 - Queries: LIMIT 20 by default unless user specifies
 - Opportunity creates: always include StageName="Prospecting" and CloseDate 30 days from today (YYYY-MM-DD format)
 - Lead creates: Company field is required
@@ -90,13 +92,68 @@ def get_sf_auth_from_cli():
 
 
 def execute_soql(soql):
+    import re
     if not soql.strip().upper().startswith("SELECT"):
         raise ValueError("Only SELECT queries are allowed for data retrieval. Use CREATE, UPDATE, or DELETE actions for modifications.")
-    results = sf_connection.query_all(soql)
+    try:
+        results = sf_connection.query_all(soql)
+    except Exception as e:
+        # If the object is not found and doesn't already end with __c, retry with __c appended
+        err = str(e)
+        if 'INVALID_TYPE' in err and '__c' not in soql:
+            # Extract object name from FROM clause and append __c
+            fixed = re.sub(
+                r'\bFROM\s+(\w+)(?!__c)\b',
+                lambda m: f"FROM {m.group(1)}__c",
+                soql, flags=re.IGNORECASE
+            )
+            results = sf_connection.query_all(fixed)
+        else:
+            raise
     records = results.get('records', [])
     for r in records:
         r.pop('attributes', None)
     return records
+
+
+def check_data_quality():
+    issues = []
+    
+    # Check 1: Accounts missing Industry
+    try:
+        res = execute_soql("SELECT Id, Name FROM Account WHERE Industry = NULL LIMIT 50")
+        for r in res:
+            issues.append({"Record": r['Name'], "Type": "Account: Missing Industry", "Recommend": "Enrich data"})
+    except Exception: pass
+
+    # Check 2: Contacts missing Email
+    try:
+        res = execute_soql("SELECT Id, Name FROM Contact WHERE Email = NULL LIMIT 50")
+        for r in res:
+            issues.append({"Record": r['Name'], "Type": "Contact: Missing Email", "Recommend": "Call/Research"})
+    except Exception: pass
+
+    # Check 3: Stale Opportunities
+    try:
+        res = execute_soql("SELECT Id, Name FROM Opportunity WHERE IsClosed = false AND CloseDate < TODAY LIMIT 50")
+        for r in res:
+            issues.append({"Record": r['Name'], "Type": "Opportunity: Stale", "Recommend": "Update/Close"})
+    except Exception: pass
+
+    if not issues:
+        return [], [], []
+
+    df = pd.DataFrame(issues)
+    
+    # Aggregation for Chart
+    counts = df['Type'].value_counts()
+    labels = counts.index.tolist()
+    data = counts.values.tolist()
+    
+    # HTML Table
+    _, html_table = make_table(issues)
+    
+    return labels, data, html_table
 
 
 def make_table(records):
@@ -138,6 +195,27 @@ async def index(request: Request):
             })
         except Exception:
             pass
+            
+    # Try connecting via Environment Variables
+    if not sf_connection:
+        try:
+            sf_user = os.getenv("SALESFORCE_USERNAME")
+            sf_pwd = os.getenv("SALESFORCE_PASSWORD")
+            sf_token = os.getenv("SALESFORCE_SECURITY_TOKEN")
+            # If token is None, use empty string
+            if sf_token is None:
+                sf_token = ""
+                
+            if sf_user and sf_pwd:
+                domain = 'test' if (sf_user and ('.develop.' in sf_user or '.sandbox.' in sf_user)) else None
+                sf_connection = Salesforce(username=sf_user, password=sf_pwd, security_token=sf_token, domain=domain)
+                return templates.TemplateResponse("index.html", {
+                    "request": request, "connected": True,
+                    "message": "Connected via Environment Variables"
+                })
+        except Exception as e:
+            print(f"Environment connection failed: {str(e)}")
+
     return templates.TemplateResponse("index.html", {
         "request": request, "connected": sf_connection is not None
     })
@@ -186,6 +264,43 @@ async def query(request: Request, nl_query: str = Form(...)):
     if not sf_connection:
         return templates.TemplateResponse("index.html", {
             "request": request, "connected": False, "error": "Not connected to Salesforce"
+        })
+
+    # ---- HARDCODED: Data Quality Report ----
+    _q = nl_query.lower()
+    if "data quality" in _q or "quality report" in _q or "quality analysis" in _q or "quality issues" in _q:
+        labels, data, html_table = check_data_quality()
+        if not labels:
+             return templates.TemplateResponse("index.html", {
+                "request": request, "connected": True, "message": "No data quality issues found! Great job."
+            })
+        
+        widgets = [
+            {
+                "title": "Total Issues by Type",
+                "chart_type": "pie",
+                "chart_labels": json.dumps(labels),
+                "chart_data": json.dumps(data),
+                "record_count": sum(data)
+            },
+            {
+                "title": "Affected Records List",
+                "table": html_table,
+                "chart_type": "none"
+            },
+            {
+                "title": "Recommendations",
+                "table": "<ul class='list-group'><li class='list-group-item'><b>Accounts:</b> Use enrichment tools to fix missing industries.</li><li class='list-group-item'><b>Contacts:</b> Run email verification or call campaigns.</li><li class='list-group-item'><b>Opportunities:</b> Close lost deals or update dates.</li></ul>",
+                "chart_type": "none"
+            }
+        ]
+        
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "connected": True,
+            "dashboard": True,
+            "dashboard_title": "Data Quality Analysis",
+            "widgets": widgets
         })
 
     client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
