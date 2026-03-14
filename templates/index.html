@@ -3,227 +3,221 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Zapi - Salesforce Explorer</title>
+    <title>Zapi - AI Salesforce Assistant</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-      :root {
-        --font-primary:
-          "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
-        --bg-color: #ffffff;
-        --text-color: #000000;
-        --border-color: #e0e0e0;
-        --button-bg: #000000;
-        --button-text: #ffffff;
-        --hover-bg: #333333;
-      }
-
+      /* Minimalist Black & White Theme */
       body {
-        background-color: var(--bg-color);
-        font-family: var(--font-primary);
-        color: var(--text-color);
-        -webkit-font-smoothing: antialiased;
-      }
-
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6 {
-        font-weight: 600;
-        letter-spacing: -0.02em;
-        margin-bottom: 1rem;
-      }
-
-      .container {
-        max-width: 900px;
-        margin-top: 60px;
-      }
-
-      /* Notion-like minimal cards */
-      .card {
-        border: 1px solid var(--border-color);
-        border-radius: 4px; /* Slight roundness */
-        box-shadow: none;
-        background: #fff;
-        margin-bottom: 20px;
-      }
-
-      .card-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        border-bottom: 1px solid var(--border-color);
-        padding-bottom: 10px;
-        margin-bottom: 20px;
-      }
-
-      /* Inputs */
-      .form-control {
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
-        padding: 10px 12px;
-        font-size: 0.95rem;
-        box-shadow: none;
-      }
-
-      .form-control:focus {
-        border-color: #000;
-        box-shadow: 0 0 0 1px #000;
-      }
-
-      .form-label {
-        font-size: 0.85rem;
-        font-weight: 500;
-        color: #666;
-        margin-bottom: 6px;
-      }
-
-      /* Buttons */
-      .btn-primary,
-      .btn-success {
-        background-color: var(--button-bg);
-        border: 1px solid var(--button-bg);
-        color: var(--button-text);
-        border-radius: 4px; /* Consistent radius */
-        font-weight: 500;
-        font-size: 0.95rem;
-        padding: 10px 16px;
-        transition: all 0.2s ease;
-      }
-
-      .btn-primary:hover,
-      .btn-success:hover {
-        background-color: var(--hover-bg);
-        border-color: var(--hover-bg);
-        color: #fff;
-      }
-
-      .btn-check:checked + .btn,
-      .btn.active,
-      .btn.show,
-      .btn:first-child:active,
-      :not(.btn-check) + .btn:active {
-        background-color: var(--hover-bg);
-        border-color: var(--hover-bg);
-        color: #fff;
-      }
-
-      /* Zapi Branding Header */
-      .brand-header {
-        margin-bottom: 40px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .brand-logo {
-        width: 32px;
-        height: 32px;
-        background: #000;
-        border-radius: 4px;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 14px;
-      }
-
-      .brand-text {
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin: 0;
-      }
-
-      /* Code block mimic */
-      code {
+        background-color: #ffffff;
+        color: #000000;
         font-family:
-          "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
-          monospace;
-        font-size: 0.85em;
-        background-color: #f7f7f5; /* Notion grey background */
-        color: #eb5757; /* Notion red for code */
-        padding: 4px 6px;
-        border-radius: 3px;
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
       }
 
-      pre code {
-        display: block;
+      /* Overrides */
+      .navbar {
+        background-color: #ffffff;
+        border-bottom: 2px solid #000000;
+        padding: 1rem 0;
+      }
+      .navbar-brand {
+        color: #000000 !important;
+        font-weight: 900;
+        letter-spacing: -1px;
+        font-size: 1.5rem;
+      }
+
+      .btn-primary {
+        background-color: #000000;
+        border: 2px solid #000000;
+        color: #ffffff;
+        border-radius: 0;
+        font-weight: bold;
+        padding: 10px 20px;
+      }
+      .btn-primary:hover,
+      .btn-primary:focus,
+      .btn-primary:active {
+        background-color: #ffffff;
+        color: #000000;
+        border-color: #000000;
+      }
+
+      .form-control {
+        border: 2px solid #000000;
+        border-radius: 0;
+        color: #000;
+        padding: 10px;
+      }
+      .form-control:focus {
+        box-shadow: none;
+        border-color: #000000;
+        background-color: #f8f8f8;
+      }
+
+      .card {
+        border: 2px solid #000000;
+        border-radius: 0;
+        box-shadow: 4px 4px 0px #000000; /* Retro shadow */
+        margin-bottom: 2rem;
+        background: #fff;
+      }
+      .card-header {
+        background-color: #ffffff;
+        border-bottom: 2px solid #000000;
+        font-weight: bold;
+        text-transform: uppercase;
+        border-radius: 0 !important;
         padding: 1rem;
-        color: #37352f;
-        background-color: #f7f7f5;
-        overflow-x: auto;
-      }
-
-      .table-responsive {
-        border-radius: 4px;
-        border: 1px solid var(--border-color);
-      }
-
-      .table {
-        margin-bottom: 0;
-      }
-
-      .table th {
-        font-weight: 600;
-        font-size: 0.85rem;
-        background-color: #fbfbfa;
-        border-bottom: 1px solid var(--border-color);
-      }
-
-      .table td {
-        font-size: 0.9rem;
-        border-bottom: 1px solid var(--border-color);
       }
 
       .alert {
-        border: 1px solid var(--border-color);
-        background-color: #fff;
-        color: #000;
-        border-left: 3px solid #000;
-        border-radius: 4px;
+        border: 2px solid #000000;
+        border-radius: 0;
+        background-color: #ffffff;
+        color: #000000;
       }
 
-      .alert-danger {
-        border-left-color: #e03e3e;
+      .suggestion-chip {
+        cursor: pointer;
+        border: 1px solid #000000;
+        background: #ffffff;
+        padding: 6px 12px;
+        display: inline-block;
+        margin: 4px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.1s;
+      }
+      .suggestion-chip:hover {
+        background: #000000;
+        color: #ffffff;
+        transform: translateY(-1px);
+      }
+
+      .sf-table {
+        width: 100%;
+        margin-bottom: 0;
+      }
+      .sf-table th {
+        background: #000000;
+        color: #ffffff;
+        font-weight: normal;
+        text-transform: uppercase;
+        padding: 12px;
+      }
+      .sf-table td {
+        border-bottom: 1px solid #ccc;
+        padding: 12px;
+      }
+      .sf-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .badge {
+        background-color: #000000 !important;
+        color: #fff;
+        border-radius: 0;
+        font-weight: normal;
+      }
+
+      pre {
+        background: #f4f4f4;
+        border: 1px solid #000;
+        padding: 15px;
+        border-radius: 0;
+        color: #000;
+      }
+      code {
+        color: #000;
+      }
+
+      .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+      }
+
+      /* Utils */
+      .text-primary {
+        color: #000000 !important;
+      }
+      .bg-success {
+        background-color: #000000 !important;
+      }
+      .border-success {
+        border-color: #000000 !important;
+      }
+      .text-success {
+        color: #000000 !important;
+      }
+      .bg-light {
+        background-color: #f4f4f4 !important;
+      }
+      .bg-primary {
+        background-color: #000000 !important;
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <div class="brand-header justify-content-center">
-        <div class="brand-logo">Z</div>
-        <h2 class="brand-text">Zapi</h2>
+    <nav class="navbar navbar-expand-lg">
+      <div class="container">
+        <a class="navbar-brand" href="/">Zapi // Vibe with Salesforce </a>
+        {% if connected %}
+        <span class="navbar-text ms-auto">
+          <span class="badge">CONNECTED</span>
+        </span>
+        {% endif %}
       </div>
+    </nav>
 
-      {% if not connected %}
+    <div class="container my-5">
+      <!-- Messages -->
+      {% if message %}
+      <div class="alert alert-dismissible fade show" role="alert">
+        <strong>STATUS:</strong> {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endif %} {% if error %}
+      <div class="alert alert-dismissible fade show" role="alert">
+        <strong>ERROR:</strong> {{ error }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endif %} {% if not connected %}
+      <!-- Connection Form -->
       <div class="row justify-content-center">
-        <div class="col-md-7">
-          <div class="card p-5">
-            <h5 class="card-title">Connect to Environment</h5>
-            <form action="/connect" method="post">
-              <div class="mb-4">
-                <label class="form-label">Username</label>
-                <input
-                  type="text"
-                  name="username"
-                  class="form-control"
-                  required
-                  placeholder="user@org.com"
-                />
-              </div>
-              <div class="row mb-4">
-                <div class="col-md-6">
-                  <label class="form-label">Password</label>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">AUTHENTICATION</div>
+            <div class="card-body p-4">
+              <form action="/connect" method="post">
+                <div class="mb-3">
+                  <label class="form-label">USERNAME</label>
+                  <input
+                    type="text"
+                    name="username"
+                    class="form-control"
+                    placeholder="user@example.com"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">PASSWORD</label>
                   <input
                     type="password"
                     name="password"
@@ -231,8 +225,8 @@
                     required
                   />
                 </div>
-                <div class="col-md-6">
-                  <label class="form-label">Security Token</label>
+                <div class="mb-3">
+                  <label class="form-label">SECURITY TOKEN</label>
                   <input
                     type="password"
                     name="token"
@@ -240,133 +234,241 @@
                     required
                   />
                 </div>
-              </div>
-
-              <div class="mb-4">
-                <label class="form-label">OpenAI API Key</label>
-                <input
-                  type="password"
-                  name="openai_key"
-                  class="form-control"
-                  required
-                />
-              </div>
-              <button type="submit" class="btn btn-primary w-100">
-                Start Session
-              </button>
-            </form>
+                <div class="mb-3">
+                  <label class="form-label">OPENAI API KEY</label>
+                  <input
+                    type="password"
+                    name="openai_key"
+                    class="form-control"
+                    required
+                    placeholder="sk-..."
+                  />
+                </div>
+                <div class="d-grid mt-4">
+                  <button type="submit" class="btn btn-primary">
+                    ESTABLISH CONNECTION
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>
       {% else %}
 
-      <div class="row">
-        <!-- Query Section -->
-        <div class="col-md-12 mb-4">
-          <div class="card p-4">
-            <h5 class="card-title">Ask Zapi</h5>
-            <form action="/query" method="post" class="d-flex gap-2">
+      <!-- Query Interface -->
+      <div class="card p-4">
+        <form action="/query" method="post" id="queryForm">
+          <div class="mb-3">
+            <label class="form-label fw-bold">INPUT COMMAND:</label>
+            <div class="input-group">
               <input
                 type="text"
                 name="nl_query"
-                class="form-control"
-                placeholder="Ask: 'Show leads' or 'Create Account Acme'..."
+                id="nlInput"
+                class="form-control form-control-lg"
+                placeholder="e.g., Show top 5 opportunities..."
+                value="{{ nl_query or '' }}"
                 required
-                style="height: 48px"
+                autocomplete="off"
               />
-              <button
-                type="submit"
-                class="btn btn-primary"
-                style="height: 48px; padding-left: 24px; padding-right: 24px"
-              >
-                Run
+              <button class="btn btn-primary px-4" type="submit" id="submitBtn">
+                EXECUTE
               </button>
-            </form>
+            </div>
+            <div class="mt-3">
+              <span
+                class="suggestion-chip"
+                onclick="ask('Show accounts by industry')"
+                >Accounts by Industry</span
+              >
+              <span
+                class="suggestion-chip"
+                onclick="ask('Create a lead for John Doe at Acme Corp')"
+                >Create Lead</span
+              >
+              <span
+                class="suggestion-chip"
+                onclick="ask('Show me a sales dashboard')"
+                >Sales Dashboard</span
+              >
+              <span
+                class="suggestion-chip"
+                onclick="ask('List recent opportunities')"
+                >Recent Opps</span
+              >
+            </div>
+          </div>
+        </form>
+      </div>
+
+      {% if success_action %}
+      <div class="card">
+        <div class="card-header">ACTION COMPLETE</div>
+        <div class="card-body">
+          {% if success_action == 'create' %}
+          <h5>CREATED {{ created_object }}</h5>
+          <p>ID: <code>{{ created_id }}</code></p>
+          <pre>{{ created_data }}</pre>
+          {% elif success_action == 'update' %}
+          <h5>UPDATED RECORDS</h5>
+          <p>{{ message }}</p>
+          {% elif success_action == 'delete' %}
+          <h5>DELETED RECORD</h5>
+          <p>{{ message }}</p>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %} {% if dashboard %}
+      <h2 class="mb-4 fw-bold text-uppercase border-bottom border-dark pb-2">
+        {{ dashboard_title }}
+      </h2>
+      <div class="row">
+        {% for widget in widgets %}
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <span>{{ widget.title }}</span>
+              {% if widget.record_count is defined %}
+              <span class="badge">{{ widget.record_count }}</span>
+              {% endif %}
+            </div>
+            <div class="card-body">
+              {% if widget.error %}
+              <div class="alert alert-warning">{{ widget.error }}</div>
+              {% endif %} {% if widget.chart_data %}
+              <div class="chart-container">
+                <canvas id="chart-{{ loop.index }}"></canvas>
+              </div>
+              <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const ctx = document.getElementById('chart-{{ loop.index }}');
+                    if (ctx) {
+                        new Chart(ctx, {
+                            type: '{{ widget.chart_type }}',
+                            data: {
+                                labels: {{ widget.chart_labels | safe }},
+                                datasets: [{
+                                    label: '{{ widget.title }}',
+                                    data: {{ widget.chart_data | safe }},
+                                    backgroundColor: ['#000000', '#404040', '#737373', '#a6a6a6', '#d9d9d9'],
+                                    borderColor: '#000000',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: { legend: { labels: { color: '#000' } } },
+                                scales: {
+                                    x: { grid: { color: '#eee' }, ticks: { color: '#000' } },
+                                    y: { grid: { color: '#eee' }, ticks: { color: '#000' } }
+                                }
+                            }
+                        });
+                    }
+                });
+              </script>
+              {% elif widget.table %}
+              <div
+                class="table-responsive"
+                style="max-height: 300px; overflow-y: auto"
+              >
+                {{ widget.table | safe }}
+              </div>
+              {% else %}
+              <p class="text-center py-5">NO DATA</p>
+              {% endif %}
+            </div>
           </div>
         </div>
+        {% endfor %}
+      </div>
 
-        {% if soql %}
-        <!-- Results Section -->
-        <div class="col-12 mb-4">
+      {% elif table or chart_data %}
+      <div class="card">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <span>{{ ai_title }}</span>
+          {% if record_count %}
+          <span class="badge">{{ record_count }} RECS</span>
+          {% endif %}
+        </div>
+        <div class="card-body">
+          {% if soql %}
+          <div class="mb-3 p-2 bg-light border border-dark">
+            <small class="text-muted d-block fw-bold display-inline mb-1"
+              >SOQL QUERY:</small
+            >
+            <code style="background: none; color: #000">{{ soql }}</code>
+          </div>
+          {% endif %}
+
           <div class="row">
-            <div class="col-md-6 mb-4">
-              <div class="card p-4 h-100">
-                <h6 class="card-title">Generated Query</h6>
-                <pre class="mb-0"><code>{{ soql }}</code></pre>
+            {% if chart_data %}
+            <div class="col-md-{% if table %}6{% else %}12{% endif %} mb-4">
+              <div class="chart-container border border-dark p-2">
+                <canvas id="mainChart"></canvas>
               </div>
+              <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const ctx = document.getElementById('mainChart');
+                    if(ctx) {
+                        new Chart(ctx, {
+                            type: '{{ chart_type }}',
+                            data: {
+                                labels: {{ chart_labels | safe }},
+                                datasets: [{
+                                    label: '{{ ai_title }}',
+                                    data: {{ chart_data | safe }},
+                                    backgroundColor: ['#000000', '#404040', '#737373', '#a6a6a6', '#d9d9d9'],
+                                    borderColor: '#000000',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: { legend: { labels: { color: '#000' } } },
+                                scales: {
+                                    x: { grid: { color: '#eee' }, ticks: { color: '#000' } },
+                                    y: { grid: { color: '#eee' }, ticks: { color: '#000' } }
+                                }
+                            }
+                        });
+                    }
+                });
+              </script>
             </div>
-
-            <!-- Visualization Section -->
-            <div class="col-md-6 mb-4">
-              <div class="card p-4 h-100">
-                <h6 class="card-title">Visualization: {{ chart_title }}</h6>
-                <canvas id="myChart"></canvas>
-              </div>
+            {% endif %} {% if table %}
+            <div class="col-md-{% if chart_data %}6{% else %}12{% endif %}">
+              <div class="table-responsive">{{ table | safe }}</div>
             </div>
-          </div>
-
-          <div class="card p-4">
-            <h6 class="card-title">Data Result</h6>
-            <div class="table-responsive">{{ table | safe }}</div>
+            {% endif %}
           </div>
         </div>
-
-        {% endif %}
       </div>
-      {% endif %} {% if error %}
-      <div class="alert alert-danger mt-3">
-        <strong>Error:</strong> {{ error }}
-      </div>
-      {% endif %} {% if message %}
-      <div class="alert mt-3">{{ message }}</div>
-      {% endif %}
+      {% endif %} {% endif %}
     </div>
 
     <script>
-      {% if chart_labels %}
-      const ctx = document.getElementById('myChart');
-      new Chart(ctx, {
-          type: 'bar',
-          data: {
-              labels: {{ chart_labels | safe }},
-              datasets: [{
-                  label: 'Value',
-                  data: {{ chart_data | safe }},
-                  backgroundColor: '#000000',
-                  hoverBackgroundColor: '#333333',
-                  borderRadius: 2,
-                  barPercentage: 0.6
-              }]
-          },
-          options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                  legend: {
-                      display: false
-                  },
-                  tooltip: {
-                      backgroundColor: '#000',
-                      titleFont: { family: 'Inter' },
-                      bodyFont: { family: 'Inter' },
-                      padding: 10,
-                      cornerRadius: 4,
-                  }
-              },
-              scales: {
-                  x: {
-                      grid: { display: false },
-                      ticks: { font: { family: 'Inter' } }
-                  },
-                  y: {
-                      beginAtZero: true,
-                      grid: { color: '#f0f0f0' },
-                      ticks: { font: { family: 'Inter' } }
-                  }
-              }
-          }
-      });
-      {% endif %}
+      function ask(q) {
+        document.getElementById("nlInput").value = q;
+        document.getElementById("queryForm").submit();
+      }
+
+      const form = document.getElementById("queryForm");
+      if (form) {
+        form.addEventListener("submit", function () {
+          const btn = document.getElementById("submitBtn");
+          btn.disabled = true;
+          btn.innerHTML = "PROCESSING...";
+        });
+      }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
