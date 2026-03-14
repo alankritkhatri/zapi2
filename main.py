@@ -50,12 +50,13 @@ KEY RULES:
 - chart_type: use "pie" or "doughnut" for category breakdowns, "bar" for comparing named items, "line" for time series, "none" for detail tables
 - chart_x and chart_y must exactly match field aliases in the SELECT clause
 - For GROUP BY queries use COUNT(Id) or SUM(field) with aliases
+- IMPORTANT: In 'ORDER BY', do NOT use the alias. Repeat the aggregate function. (e.g., ORDER BY COUNT(Id) DESC, not ORDER BY cnt DESC)
 - Dashboards: create 3-4 widgets mixing charts and detail tables
 - Return ONLY the JSON object
 
 EXAMPLES:
 User: "show accounts by industry"
-{"action":"query","soql":"SELECT Industry, COUNT(Id) cnt FROM Account WHERE Industry != null GROUP BY Industry ORDER BY cnt DESC LIMIT 20","chart_type":"pie","chart_x":"Industry","chart_y":"cnt","title":"Accounts by Industry"}
+{"action":"query","soql":"SELECT Industry, COUNT(Id) cnt FROM Account WHERE Industry != null GROUP BY Industry ORDER BY COUNT(Id) DESC LIMIT 20","chart_type":"pie","chart_x":"Industry","chart_y":"cnt","title":"Accounts by Industry"}
 
 User: "create a lead for John Doe at Acme, john@acme.com"
 {"action":"create","object":"Lead","data":{"FirstName":"John","LastName":"Doe","Company":"Acme","Email":"john@acme.com"},"title":"New Lead: John Doe @ Acme"}
@@ -70,6 +71,28 @@ User: "show me a sales dashboard"
   {"title":"Recent Opportunities","soql":"SELECT Name, StageName, Amount, CloseDate FROM Opportunity ORDER BY CreatedDate DESC LIMIT 10","chart_type":"none"},
   {"title":"Leads by Status","soql":"SELECT Status, COUNT(Id) cnt FROM Lead GROUP BY Status","chart_type":"doughnut","chart_x":"Status","chart_y":"cnt"}
 ]}
+
+User: "show support dashboard"
+{"action":"dashboard","title":"Support Dashboard","widgets":[
+  {"title":"Cases by Priority","soql":"SELECT Priority, COUNT(Id) cnt FROM Case GROUP BY Priority","chart_type":"pie","chart_x":"Priority","chart_y":"cnt"},
+  {"title":"Cases by Status","soql":"SELECT Status, COUNT(Id) cnt FROM Case GROUP BY Status","chart_type":"bar","chart_x":"Status","chart_y":"cnt"},
+  {"title":"Open Cases","soql":"SELECT CaseNumber, Subject, Priority, Status FROM Case WHERE IsClosed=false ORDER BY CreatedDate DESC LIMIT 10","chart_type":"none"}
+]}
+
+User: "show marketing dashboard"
+{"action":"dashboard","title":"Marketing Dashboard","widgets":[
+  {"title":"Leads by Source","soql":"SELECT LeadSource, COUNT(Id) cnt FROM Lead GROUP BY LeadSource","chart_type":"doughnut","chart_x":"LeadSource","chart_y":"cnt"},
+  {"title":"Leads by Status","soql":"SELECT Status, COUNT(Id) cnt FROM Lead GROUP BY Status","chart_type":"bar","chart_x":"Status","chart_y":"cnt"},
+  {"title":"Recent Leads","soql":"SELECT Name, Company, LeadSource, Status FROM Lead ORDER BY CreatedDate DESC LIMIT 10","chart_type":"none"}
+]}
+
+User: "show revenue dashboard"
+{"action":"dashboard","title":"Revenue Dashboard","widgets":[
+  {"title":"Pipeline Amount by Stage","soql":"SELECT StageName, SUM(Amount) total FROM Opportunity WHERE IsClosed=false GROUP BY StageName ORDER BY SUM(Amount) DESC","chart_type":"bar","chart_x":"StageName","chart_y":"total"},
+  {"title":"Revenue by Type","soql":"SELECT Type, SUM(Amount) total FROM Opportunity WHERE StageName='Closed Won' GROUP BY Type","chart_type":"pie","chart_x":"Type","chart_y":"total"},
+  {"title":"Top Opportunities","soql":"SELECT Name, Amount, StageName, CloseDate FROM Opportunity WHERE IsClosed=false ORDER BY Amount DESC LIMIT 10","chart_type":"none"}
+]}
+
 
 User: "update all accounts in tech industry, set rating to Hot"
 {"action":"update","object":"Account","where":"Industry = 'Technology'","data":{"Rating":"Hot"},"title":"Updated Tech Accounts"}

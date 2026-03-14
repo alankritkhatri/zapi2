@@ -367,13 +367,16 @@
                 autocomplete="off"
               ></textarea>
               <button
-                class="btn btn-outline-dark"
+                class="btn btn-primary"
                 type="button"
                 id="micBtn"
                 title="Speak"
                 style="background-color: rgb(222, 72, 72)"
               >
-                🎤
+                <!-- Force white monochrome emoji -->
+                <span style="filter: grayscale(100%) brightness(1000%)"
+                  >🎤</span
+                >
               </button>
               <button class="btn btn-primary px-4" type="submit" id="submitBtn">
                 EXECUTE
@@ -397,6 +400,21 @@
                 class="suggestion-chip"
                 onclick="ask('List recent opportunities')"
                 >Recent Opps</span
+              >
+              <span
+                class="suggestion-chip"
+                onclick="ask('Show support dashboard')"
+                >Support Dash</span
+              >
+              <span
+                class="suggestion-chip"
+                onclick="ask('Show marketing dashboard')"
+                >Marketing Dash</span
+              >
+              <span
+                class="suggestion-chip"
+                onclick="ask('Show revenue dashboard')"
+                >Revenue Dash</span
               >
             </div>
           </div>
@@ -732,7 +750,7 @@
           recognition.lang = "en-US";
 
           recognition.onstart = function () {
-            micBtn.innerHTML = "🔴";
+            micBtn.innerHTML = "⚪";
             micBtn.classList.add("btn-danger");
             micBtn.classList.remove("btn-outline-dark");
           };
